@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="SkelSplat">
+  <meta name="keywords" content="Keywords">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkelSplat: Robust Multi-view 3D Human Pose Estimation with Differentiable Gaussian Rendering</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <style>
+
+    .video-gallery-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      margin: 4rem 0; /* space above and below */
+    }
+
+  .video-gallery {
+    position: relative;
+    width: 80%;
+    max-width: 720px;
+    margin: 0 auto;
+    /* Use page bg (not black) so edges never flash black */
+    background: transparent;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+
+    video {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .video-gallery video {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: opacity 0.4s ease;
+      background-color: #f5f5f5; /* light gray background instead of black */
+    }
+
+    .vg-video {
+      position: absolute;
+      inset: 0;               /* top:0; right:0; bottom:0; left:0 */
+      width: 100%;
+      height: 100%;
+      object-fit: contain;    /* or 'cover' if you prefer */
+      opacity: 0;
+      transition: opacity 0.45s ease;
+      background-color: #f5f5f5; /* light fallback while decoding (not black) */
+      pointer-events: none;       /* clicks pass through unless active */
+    }
+    .vg-video.active {
+      opacity: 1;
+      pointer-events: auto;       /* controls only on the active video */
+      position: relative;         /* keep stacking order clean */
+    }
+
+    /* Transition temp video style */
+    .transition-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      z-index: 2;
+      transition: transform 0.2s ease;
+    }
+    .arrow:hover { transform: translateY(-50%) scale(1.2); }
+    .arrow.left  { left: 10px; }
+    .arrow.right { right: 10px; }
+    .arrow i     { color: white; font-size: 2rem; text-shadow: 0 0 6px rgba(0,0,0,0.5); }
+
+  </style>
+
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">SkelSplat: Robust Multi-view 3D Human Pose Estimation with Differentiable Gaussian Rendering</h1>
+          
+          <!-- <p style="font-size: 1.25rem; margin: 1rem 0;">
+              <b>🎉 Accepted to <span style="color:#3273dc;">WACV 2026</span>!🎉</b>
+            </p> -->
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://www.linkedin.com/in/laura-bragagnolo/?locale=en_US">Laura Bragagnolo</a><sup>1</sup>,</span>
+             <span class="author-block">
+              <a href="https://it.linkedin.com/in/leonardo-barcellona-ab0506196">Leonardo Barcellona</a><sup>2</sup>,</span>
+            <span class="author-block">
+              <a href="http://www.dei.unipd.it/~ghidoni/">Stefano Ghidoni</a><sup>1</sup></span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>University of Padova</span>
+            <span class="author-block"><sup>2</sup>University of Amsterdam</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+             <!-- ArXiv Link. -->
+              <span class="link-block">
+                <a href=""
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+            
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/laurabragagnolo/SkelSplat"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+
+              <span class="link-block">
+                <a href="#video"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video</span>
+                  </a>
+              </span>
+
+              <!-- Bibtex Link. -->
+              <span class="link-block">
+                <a href="#bibtex"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-obp"></i>
+                  </span>
+                  <span>BibTeX</span>
+                  </a>
+                </span>
+
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="video-gallery">
+      <!-- Active video on top -->
+      <video id="vidA" class="vg-video active" controls autoplay muted loop playsinline>
+        <source src="static/videos/h36m_results.mp4" type="video/mp4">
+      </video>
+
+      <!-- Standby video underneath (no controls, enabled when it becomes active) -->
+      <video id="vidB" class="vg-video" autoplay muted loop playsinline></video>
+
+      <button class="arrow left" onclick="prevVideo()">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="arrow right" onclick="nextVideo()">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const sources = [
+      "static/videos/h36m_results.mp4",
+      "static/videos/panoptic_results.mp4",
+      "static/videos/h36m_occ_results.mp4"
+    ];
+
+    let current = 0;
+    const vidA = document.getElementById('vidA');
+    const vidB = document.getElementById('vidB');
+
+    // Keep references to which is active/standby
+    let active  = vidA;
+    let standby = vidB;
+
+    function swapTo(index) {
+      if (index < 0) index = sources.length - 1;
+      if (index >= sources.length) index = 0;
+
+      // Prepare the standby video
+      standby.src = sources[index];
+      standby.load(); // ensure it starts loading new source
+
+      // Wait until it can render a frame to avoid black
+      standby.addEventListener('canplay', function onReady() {
+        standby.removeEventListener('canplay', onReady);
+
+        // Sync control state (only active should have controls)
+        standby.controls = true;
+        active.controls = false;
+
+        // Start playback so we fade into a playing frame
+        // (Autoplay works because it's muted + playsinline)
+        standby.play().catch(() => { /* ignore autoplay quirks */ });
+
+        // Crossfade: new standby fades in, old active fades out
+        standby.classList.add('active');
+        active.classList.remove('active');
+
+        // After transition, swap roles
+        setTimeout(() => {
+          const tmp = active;
+          active = standby;
+          standby = tmp;
+          current = index;
+        }, 450); // match CSS transition duration
+      }, { once: true });
+    }
+
+    function nextVideo() { swapTo(current + 1); }
+    function prevVideo() { swapTo(current - 1); }
+  </script>
+</section>
+
+
+<section class="hero is-small is-light py-6">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 mb-5">Overview</h2>
+        <div class="content has-text-justified">
+          <p>
+            Accurate <b>3D human pose estimation</b> is fundamental for applications such as augmented reality and human-robot interaction. 
+            State-of-the-art multi-view methods learn to fuse predictions across views by training on <b>large annotated datasets</b>, leading to <b>poor generalization</b> when the test scenario differs.
+            To overcome these limitations, we propose <b>SkelSplat</b>, a <b>novel framework for multi-view 3D human pose estimation</b> based on <b>differentiable Gaussian rendering</b>.
+            Human pose is modeled as a <b>skeleton of 3D Gaussians</b>, one per joint, optimized via differentiable rendering to enable seamless fusion of arbitrary
+            camera views <b>without 3D ground-truth supervision</b>. Since Gaussian Splatting was originally designed for dense scene reconstruction, we propose a <b>novel one-hot encoding scheme</b>
+            that enables independent optimization of human joints. SkelSplat outperforms approaches that do not rely on 3D ground truth in Human3.6M and CMU, while reducing
+            the cross-dataset error up to <b>47.8%</b> compared to learning-based methods. Experiments on Human3.6M-Occ and Occlusion-Person demonstrate <b>robustness to occlusions</b>, without scenario-specific fine-tuning.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section pb-3">
+  <div class="container is-max-widescreen">
+    <div class="rows">
+      <div class="rows is-centered ">
+        <div class="row is-full-width">
+
+          <h2 class="title is-3"><span>SkelSplat</span></h2>
+          <p>
+            <b>SkelSplat</b> leverages the <b>Gaussian Splatting</b> representation to model <b>each human joint as a 3D Gaussian</b>. 
+            Given an initial 3D pose guess and 2D predictions from multiple cameras, <b>SkelSplat</b> constructs a Gaussian representation by building an anisotropic Gaussian for each body joint.
+            <b>Pseudo-ground truth heatmaps</b> are generated from the 2D detections and used to supervise the optimization, which refines the Gaussians by minimizing a <b>differentiable loss between heatmaps and Gaussian renderings</b>. 
+          </p>
+
+          <br>
+          <br>
+          <img src="./static/images/framework.png" class="interpolation-image" alt="SkelSplat framework overview.">
+          <br>
+          <br>
+          <br>
+          <br>
+          <h3 class="title is-4">Joint Encoding</h3>
+          <p>
+            <img src="static/images/encoding.png" class="interpolation-image" width="500" align="right" style="margin:0% 0% " alt="Joint Encoding Scheme.">
+            We tailor the rendering function to human pose estimation by introducing a <b>one-hot encoding scheme for joints</b>. 
+            We modify the RGB-based appearance encoding with a joint identity encoding that activates only the j-th channel for the j-th joint Gaussian.
+            This identity vector is encoded using <b>degree-zero spherical harmonics coefficients</b>, repurposing the appearance field to represent joint identity rather than color.
+            We modify also the <b>rendering function</b> accordingly, to produce a <b>N-channel tensor</b>, where each channel corresponds to the splat of a single joint Gaussian on a camera view.
+            This allows <b>independent supervision</b> of each Gaussian, even when multiple 2D joint detections are overlapping in the image plane.
+          </p>
+          <br>
+          <br>
+          <br>
+          <br>
+          <h3 class="title is-4">Optimization</h3>
+          <p>
+          The optimization refines the parameters of each joint Gaussian by minimizing a loss between the rendered splats and the pseudo-ground truth heatmaps.
+          We employ a combination of a <b>L2 loss</b>, which encourages the rendered splats to align with the 2D detections, and a <b>3D bone length consistency loss</b>, which enforces that regular lengths of symmetric limbs, 
+          such as arms or legs, to encourage the recovered 3D structure to be anatomically coherent.
+          The optimization is performed using gradient descent, leveraging the differentiable nature of the rendering process to backpropagate errors from the 2D image space to the 3D Gaussian parameters.
+          </p>
+          <br>
+          <div class="column interpolation-video-column">
+          <div class="is-centered" id="interpolation-image-wrapper" style="text-align: center; max-width: 80%; margin: 0 auto;">
+              Loading...
+          </div>
+          <input class="slider is-fullwidth is-large is-info"
+                id="interpolation-slider"
+                step="1" min="0" max="100" value="0" type="range"
+                style="width: 80%; display: block; margin: 1rem auto;">
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<section class="hero is-small is-light py-6">
+  <div class="container is-max-desktop" id="video">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3"><span>Video</span></h2>
+        <video poster="" id="01" controls muted loop playsinline
+               style="width:100%; height:auto; max-height:560px;">
+          <source src="static/videos/SkelSplat_video.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop content" id="bibtex">
+  <h2 class="title">BibTeX</h2>
+    <pre>
+      <code>
+      @inproceedings{bragagnolo2024skelsplat,
+      title={SkelSplat: Robust Multi-view 3D Human Pose Estimation with Differentiable Gaussian Rendering},
+      author={Bragagnolo, Laura and Barcellona, Leonardo and Ghidoni, Stefano},
+      booktitle={},
+      year={2024}}</code>
+    </pre>    
+</div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+            Source code of the website from <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>. If you use, keep this link in the footer.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
